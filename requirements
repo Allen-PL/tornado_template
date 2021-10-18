@@ -1,0 +1,4 @@
+tornado==6.1
+SQLAlchemy==1.4.25
+almebic==1.7.4
+itsdangerous==2.0.1
