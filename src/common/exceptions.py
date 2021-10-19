@@ -60,21 +60,21 @@ class DataTypeError(ApiException):
 
 # ************ OS INNER EXCEPTION ***********
 class OSInnerError(ApiException):
-    msg = '系统内部异常'
+    msg = '系统内部服务异常'
 
 
 class MongoDBError(OSInnerError):
-    pass
+    code = 1008
 
 
 class MySQLError(OSInnerError):
-    pass
+    code = 1009
 
 
 class RedisError(OSInnerError):
-    pass
+    code = 1010
 
 
 class RabbitmqError(OSInnerError):
-    pass
+    code = 1011
 

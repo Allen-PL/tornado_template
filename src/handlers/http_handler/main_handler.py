@@ -4,24 +4,30 @@
 # @Author: pl
 # @Time: 2021/10/15 9:20
 # from utils.authenticated import login_authentication
+import time
+
+import tornado
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from handlers.base_handler import BaseHandler
 from common.exceptions import ApiException
-from models.base import get_db_session, User
+from models.user import User
+from utils.cache_set import UserCache
 from utils.web_log import get_logger
 
 
 class MainHandler(BaseHandler):
 
     # @login_authentication
-    async def get(self, db_session: AsyncSession = get_db_session):
-        async with db_session.begin():
-            results = await get_db_session().execute(select(User).limit(10))
-        data = results.scalars().all()
-        print(data)
-        return self.response_data(data)
+    async def get(self):
+        # 走校验，将校验后的参数也封装进data中，到时候只传入校验后的数据
+        # data = await User.get_user_info(**self.data)
+        # for i in data:
+        #     print(i.name)
+        await UserCache.strict_set('name', 'pl')
+
+        return self.response_data(info='ok')
 
     def post(self):
         print(self.data.get('name'))
@@ -29,4 +35,6 @@ class MainHandler(BaseHandler):
 
     def put(self):
         return self.response_data('ok')
+
+
 

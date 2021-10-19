@@ -13,6 +13,7 @@ from utils.web_log import get_logger
 
 async def mongodb_connect(conn_time=settings.MONGODB_CONN_TIME, retry_interval=5):
     """
+    mongo的同步连接
     :param retry_interval: 重试间隔（单位：s）
     :param re_conn: 失败自动重连
     :param conn_time: 限制连接次数
@@ -39,6 +40,7 @@ async def mongodb_connect(conn_time=settings.MONGODB_CONN_TIME, retry_interval=5
 
 async def mongodb_async_connect(conn_time=None, retry_interval=5):
     """
+    mongo的异步连接
         :param retry_interval: 重试间隔（单位：s）
         :param re_conn: 失败自动重连
         :param conn_time: 限制连接次数
