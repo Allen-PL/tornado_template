@@ -31,8 +31,6 @@ C
 logs/2021-10-18.log,2\c\2cea494ee753c86f2b0d7689052fb50195df5757
 C
 src/common/start.py,b\8\b897b9c10b462b78fa3f457aab99bf94d2dc1656
-?
-src/common/g.py,c\c\cc1becb6cf5f85bb451f77301083995204b24bc4
 S
 #src/connector/rabbitmq_connector.py,f\c\fcb4112796f5842cbc667d7c050cb863754bae4e
 B
@@ -40,3 +38,17 @@ B
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
+>
+src/routers.py,a\1\a17303be4e818e5a08d49374b672c47cc30206fb
+C
+logs/2021-10-19.log,e\e\ee6b3ac415c776928c50f666ab7769d906c2d609
+U
+%alembic/versions/d9f91ec64226_init.py,f\6\f663ac1f0e7f47279fc0606d8feb32875c43a140
+;
+alembic.ini,d\8\d84513684d01938b65661cf0358065b11872e9bf
+L
+src/handlers/base_handler.py,4\5\456a617c00b71c757870d87acc877c62b0b63598
+A
+src/common/web.py,7\6\76cdf125babcf8ad3b3d6d1395cb360e59271430
+H
+src/common/exceptions.py,4\f\4fecc43f09910d6bcb09c159e6e0e562e39c75bb

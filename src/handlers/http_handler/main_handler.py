@@ -7,14 +7,31 @@
 import time
 
 import tornado
+from aioredis import ConnectionPool, Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from conf import settings
+from connector.redis_connector import redis_async_connect, BaseCache
 from handlers.base_handler import BaseHandler
 from common.exceptions import ApiException
 from models.user import User
 from utils.cache_set import UserCache
 from utils.web_log import get_logger
+
+
+async def get_redis_pool():
+    _redis_pool = ConnectionPool.from_url(
+        "redis://{}:{}@{}:{}/{}".format(
+            settings.REDIS_USER,
+            settings.REDIS_PASSWORD,
+            settings.REDIS_HOST,
+            settings.REDIS_PORT,
+            settings.REDIS_DB),
+        encoding="utf-8", decode_responses=True
+    )
+    connect = Redis(connection_pool=_redis_pool)
+    return connect
 
 
 class MainHandler(BaseHandler):
@@ -25,7 +42,10 @@ class MainHandler(BaseHandler):
         # data = await User.get_user_info(**self.data)
         # for i in data:
         #     print(i.name)
-        await UserCache.strict_set('name', 'pl')
+
+        # (await redis_async_connect()).set('name2', 'pl2')
+
+        await BaseCache().strict_set('name2', 'pl2')
 
         return self.response_data(info='ok')
 

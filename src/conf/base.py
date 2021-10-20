@@ -10,7 +10,7 @@ import datetime
 
 # APP BASIC INFO
 APP_HOST = '127.0.0.1'
-APP_PORT = 9999
+APP_PORT = 8888
 DEBUG = True
 
 # VERSION INFO
@@ -54,6 +54,7 @@ REDIS_PORT = 6379
 REDIS_CONN_TIME = 5
 REDIS_PREFIX = 'empt'
 REDIS_EXPIRE_TIME = -1
+REDIS_DB = 0
 G_REDIS_KEY = 'redis_connector'
 
 
