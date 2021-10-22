@@ -1,12 +1,0 @@
-
-jpython:S1192Ÿ"RDefine a constant instead of duplicating this literal '%Y-%m-%d %H:%M:%S' 3 times.(åÕÈ
-gpython:S1192¡"IDefine a constant instead of duplicating this literal '%Y-%m-%d' 3 times.(Ñ±Ü¼ùÿÿÿÿ
-†python:S1192Û"hDefine a constant instead of duplicating this literal 'è¯¥å­—æ®µå¿…é¡»æ˜¯ä¸€ä¸ªå­—ç¬¦ä¸²æ ¼å¼' 3 times.(Ñ¢Úéüÿÿÿÿ
-npython:S1192%"VDefine a constant instead of duplicating this literal 'è¯¥å­—æ®µä¸èƒ½ä¸ºç©º' 3 times.(Ç€³Ù
-Gpython:S1066*"/Merge this if statement with the enclosing one.(‰åû©
-Qpython:S35165"9Refactor this method to not always return the same value.(ÑÅ¼¶
-zpython:S1871;"bEither merge this branch with the identical one on line "55" or change one of the implementations.(‰åû©
-Qpython:S3516K"9Refactor this method to not always return the same value.(ÑÅ¼¶
-zpython:S1871Q"bEither merge this branch with the identical one on line "77" or change one of the implementations.(Œ™¿¶
-mpython:S3776™"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(ÑÅ¼¶
-lpython:S3776ö"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(Äİ÷D

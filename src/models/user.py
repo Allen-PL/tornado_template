@@ -5,10 +5,9 @@
 # @Time: 2021/10/19 15:32
 from sqlalchemy import Column, Integer, String, select
 from sqlalchemy.ext.asyncio import AsyncResult
-from sqlalchemy.orm.query import Query
 
-from connector.mysql_connector import create_session
-from models.base import Base
+from src.connector.mysql_connector import create_session
+from src.models.base import Base
 
 
 class User(Base):

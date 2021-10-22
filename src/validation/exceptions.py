@@ -8,14 +8,16 @@ from common.exceptions import ParamsError
 
 class ValidException(ParamsError):
     """自定义校验异常"""
-    def __init__(self, info=None, msg='字段校验错误'):
-        super().__init__(msg)
+    def __init__(self, info=None, msg='自定义字段校验错误'):
+        super().__init__(msg, info)
         self.info = info
         self.msg = msg
 
 
 class FieldValidException(ParamsError):
     """自定义字段校验异常"""
+
     def __init__(self, msg='字段校验错误'):
         super().__init__(msg)
         self.msg = msg
+

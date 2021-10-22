@@ -17,8 +17,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_scop
 from sqlalchemy.orm import sessionmaker
 from aiomysql.sa import create_engine
 
-from common.exceptions import MySQLError
-from conf import settings
+from src.common.exceptions import MySQLError
+from src.conf import settings
 
 
 class DatabaseManager:

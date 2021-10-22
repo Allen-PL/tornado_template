@@ -3,7 +3,7 @@
 @Author  : ybb
 @Time    : 2020/9/28 18:12
 """
-from validation.exceptions import ValidException, FieldValidException
+from .exceptions import ValidException, FieldValidException
 from .field_validation import FieldValidation
 
 
@@ -25,13 +25,13 @@ class BaseValidation(object):
                 try:
                     ret_val = rule.valid(val)
                 except FieldValidException as e:
-                    field_errors.append(e.message)
+                    field_errors.append(e.msg)
             if not field_errors:
                 validated_data[field] = ret_val
                 continue
             errors[field] = field_errors
         if errors:
-            raise ValidException(detail=errors, message='数据校验错误')
+            raise ValidException(info=errors, msg='数据校验错误')
         self.validated_data = validated_data
 
     def valid_rules(self):

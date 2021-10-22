@@ -6,8 +6,7 @@
 import math
 import re
 from datetime import datetime
-from validation.exceptions import FieldValidException
-from shendi_django_common.response import ParamsError
+from .exceptions import FieldValidException
 
 
 class FieldValidation(object):
@@ -38,9 +37,8 @@ class NotEmpty(FieldValidation):
         super().__init__(message)
 
     def valid(self, val):
-        if not isinstance(val, bool):
-            if not val:
-                raise FieldValidException(self.message)
+        if not isinstance(val, bool) and not val:
+            raise FieldValidException(self.message)
         return val
 
 
@@ -55,10 +53,11 @@ class AssertFalse(FieldValidation):
             if not val:
                 return False
             raise FieldValidException(self.message)
-        elif isinstance(val, int):
+        elif isinstance(val, int) and not val:
             if not val:
                 return False
-            raise FieldValidException(self.message)
+            else:
+                raise FieldValidException(self.message)
         elif isinstance(val, str):
             if val == 'False' or val == 'false':
                 return False
@@ -80,7 +79,8 @@ class AssertTrue(FieldValidation):
         elif isinstance(val, int):
             if val:
                 return True
-            raise FieldValidException(self.message)
+            else:
+                raise FieldValidException(self.message)
         elif isinstance(val, str):
             if val == 'True' or val == 'true':
                 return True
@@ -248,6 +248,7 @@ class Past(FieldValidation):
         可以是字符串形式的一串数字, 或者是数字 (时间戳)
         或者是 yyyy-mm-dd [HH:MM:SS]的格式
         """
+        print(1)
         now = datetime.now()
         if not isinstance(val, datetime):
             if isinstance(val, str):
@@ -344,16 +345,16 @@ class DatetimeFormat(FieldValidException):
         if isinstance(val, datetime):
             return val
         if not isinstance(val, str):
-            raise ParamsError('该字段必须是一个字符串格式')
+            raise FieldValidException('该字段必须是一个字符串格式')
         try:
             if ':' in val:
                 date = datetime.strptime(val, '%Y-%m-%d %H:%M:%S')
             elif '-' in val:
                 date = datetime.strptime(val, '%Y-%m-%d')
             else:
-                raise FieldValidException(self.message)
+                raise FieldValidException(self.msg)
         except (ValueError, TypeError):
-            raise FieldValidException(self.message)
+            raise FieldValidException(self.msg)
         return date
 
 
@@ -365,9 +366,9 @@ class IsPhone(FieldValidException):
 
     def valid(self, val):
         if not isinstance(val, str):
-            raise ParamsError('该字段必须是一个字符串格式')
+            raise FieldValidException('该字段必须是一个字符串格式')
         code = re.match(r'^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0-3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$', val)
         if not code:
-            raise ParamsError('手机号码格式不正确')
+            raise FieldValidException('手机号码格式不正确')
         return val
 

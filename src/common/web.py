@@ -4,11 +4,14 @@
 # @Author: pl
 # @Time: 2021/10/18 10:01
 import json
+import re
 import traceback
 
-from tornado import web, websocket
+from tornado import web, websocket, gen
 
-from common.exceptions import ApiException, DataTypeError
+from common.exceptions import ApiException, DataTypeError, AuthenticationError, ParamsError
+from conf import settings
+from utils.auth_util import token_to_user
 from utils.web_log import get_logger
 
 
@@ -43,20 +46,34 @@ class HttpBasicHandler(web.RequestHandler):
 
     # 重写web的钩子，每次请求都会执行
     def initialize(self):
-        print(self.request.path)
-        # for url in WHITE_LIST:
-        #     if url.match(self.request.path):
+        '''
+        TODO 这个钩子里面不能抛出任何异常
+        def _initialize(self) -> None:
+            pass
+        '''
+        raise ParamsError
+        # print(self.request.path)
+        # for url in settings.WHITE_LIST:
+        #     if re.match(self.request.path, url):
         #         return None
         # token = self.data.get('access_token')
-        # try:
-        #     if token:
+        # print('----------token:', token)
+        #
+        # if token:
+        #     try:
         #         user, token = token_to_user(token)
-        #     else:
-        #         user, token = None, None
-        #     setattr(self.data, 'user', user)
-        #     setattr(self.data, 'token', token)
-        # except Exception as e:
-        #     access_log(f'token解析异常，异常原因： { e }')
+        #     except Exception as e:
+        #         get_logger().exception(f'token解析异常，异常原因： {e}')
+        #         raise AuthenticationError()
+        # else:
+        #     user, token = None, None
+        #     raise AuthenticationError()
+        # setattr(self.data, 'user', user)
+        # setattr(self.data, 'token', token)
+
+
+
+
 
     def response_data(self, code=200, msg='请求成功', info=None):
         result = {

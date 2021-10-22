@@ -5,6 +5,7 @@
 # @Time: 2021/10/14 16:07
 
 class ApiException(Exception):
+    __repr__ = 'ApiException'
     code = 1000
     msg = '系统异常'
     info = None
@@ -23,38 +24,49 @@ class ApiException(Exception):
 
 
 # ************ HTTP ERROR **********
-class ParamsError(ApiException):
+class AuthenticationError(ApiException):
     code = 1001
+    msg = '认证失败'
+
+
+class ParamsError(ApiException):
+    code = 1002
     msg = '参数错误'
+
+    def __init__(self, msg, info=None):
+        if msg:
+            self.msg = msg
+        if info:
+            self.info = info
 
 
 class TokenError(ApiException):
-    code = 1002
+    code = 1003
     msg = "未登录"
 
 
 class AuthorityError(ApiException):
-    code = 1003
+    code = 1004
     msg = "无权限"
 
 
 class NotFoundError(ApiException):
-    code = 1004
+    code = 1005
     msg = '无此项目'
 
 
 class TimeError(ApiException):
-    code = 1005
+    code = 1006
     msg = "敬请期待"
 
 
 class StatusError(ApiException):
-    code = 1006
+    code = 1007
     msg = '状态有误'
 
 
 class DataTypeError(ApiException):
-    code = 1007
+    code = 1008
     msg = '数据类型错误'
 
 
@@ -64,17 +76,21 @@ class OSInnerError(ApiException):
 
 
 class MongoDBError(OSInnerError):
-    code = 1008
+    code = 1101
 
 
 class MySQLError(OSInnerError):
-    code = 1009
+    code = 1102
 
 
 class RedisError(OSInnerError):
-    code = 1010
+    code = 1103
 
 
 class RabbitmqError(OSInnerError):
-    code = 1011
+    code = 1104
 
+
+class CacheError(OSInnerError):
+    """缓存异常"""
+    code = 1105
