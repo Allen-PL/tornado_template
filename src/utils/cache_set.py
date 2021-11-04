@@ -39,3 +39,10 @@ class UserCache(BaseCache):
                 get_logger().exception(f'查询用户缓存信息异常，异常信息：{e}')
         return await self.get(self.prefix + pk)
 
+
+class RoleCache(BaseCache):
+
+    prefix = 'role::'
+
+    pass
+

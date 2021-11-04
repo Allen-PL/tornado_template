@@ -13,9 +13,9 @@ from asyncio import current_task
 from functools import wraps
 from typing import Callable
 
+from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_scoped_session
-from sqlalchemy.orm import sessionmaker
-from aiomysql.sa import create_engine
+from sqlalchemy.orm import sessionmaker, Session, scoped_session
 
 from src.common.exceptions import MySQLError
 from src.conf import settings
@@ -61,7 +61,7 @@ class DatabaseManager:
 
 
 @contextlib.asynccontextmanager
-async def create_session():
+async def create_session() -> Session:
     db = DatabaseManager()
     session = db.session
     try:
@@ -74,37 +74,72 @@ async def create_session():
         await session.close()
 
 
-# ================ External Interface =======================
+def provide_session(func):
+    """
+    Function decorator that provides a session if it isn't provided.
+    If you want to reuse a session or run the function as part of a
+    database transaction, you pass it to the function, if not this wrapper
+    will create one and close it for you.
+    """
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        arg_session = 'session'
+
+        func_params = func.__code__.co_varnames
+        session_in_args = arg_session in func_params and \
+            func_params.index(arg_session) < len(args)
+        session_in_kwargs = arg_session in kwargs
+        if session_in_kwargs or session_in_args:
+            return await func(*args, **kwargs)
+        else:
+            async with create_session() as session:
+                kwargs[arg_session] = session
+                return await func(*args, **kwargs)
+
+    return wrapper
 
 
-# def provide_session(func):
-#     """
-#     Function decorator that provides a session if it isn't provided.
-#     If you want to reuse a session or run the function as part of a
-#     database transaction, you pass it to the function, if not this wrapper
-#     will create one and close it for you.
-#     """
-#     @wraps(func)
-#     async def wrapper(*args, **kwargs):
-#         arg_session = 'session'
-#
-#         func_params = func.__code__.co_varnames
-#         session_in_args = arg_session in func_params and \
-#             func_params.index(arg_session) < len(args)
-#         session_in_kwargs = arg_session in kwargs
-#         if session_in_kwargs or session_in_args:
-#             return await func(*args, **kwargs)
-#         else:
-#             async with create_session() as session:
-#                 kwargs[arg_session] = session
-#                 return await func(*args, **kwargs)
-#
-#     return wrapper
+# SYNC
+class SyncDatabaseManager(object):
+    """
+    连接元数据库的类，在__init__中进行初始化
+    """
+    def __init__(self):
+        # 第一步：创建一个AsyncEngine实例
+        self._engine = create_engine(('mysql+aiomysql://{}:{}@{}:{}/{}'.format(
+            settings.MYSQL_USER,
+            settings.MYSQL_PASSWORD,
+            settings.MYSQL_HOST,
+            settings.MYSQL_PORT,
+            settings.MYSQL_DATABASE,
+            )), echo=True)
+
+        self.session = None
+        self.initialize()
+
+    def initialize(self):
+        self.session = Session(bind=self._engine)
 
 
+@contextlib.contextmanager
+def sync_session():
+    db = SyncDatabaseManager()
+    session = db.session
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise MySQLError
+    finally:
+        session.close()
 
 
+if __name__ == '__main__':
+    from models.users import Merchant
+    with sync_session() as session:
+        data = session.query(Merchant).all()
 
 
-
+    print(data)
 

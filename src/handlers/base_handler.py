@@ -34,13 +34,15 @@ class BaseHandler(HttpBasicHandler, ApiException):
             # 自定义异常抛400
             if isinstance(exc_instance, ApiException):
                 self.set_status(400)
-                return self.response_data(exc_instance.code, exc_instance.msg, exc_instance.info)
+                return self.response_data(code=exc_instance.code, msg=exc_instance.msg, info=exc_instance.info)
             # 系统未知异常抛500
             self.set_status(status_code)
-            return self.response_data(**ApiException().os)
+            return self.response_data(*(ApiException().os))
 
     def set_default_headers(self):
         """添加返回content-type是json的标识符, 方便postman调试"""
         super().set_default_headers()
         self.set_header('Access-Control-Allow-Methods', 'PUT,DELETE,OPTIONS,GET,POST')
         self.set_header("Content-Type", "application/json; charset=utf-8")
+
+

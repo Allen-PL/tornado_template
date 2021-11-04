@@ -20,7 +20,7 @@ class ApiException(Exception):
 
     @property
     def os(self):
-        return {'code': self.code, 'msg': self.msg, 'info': self.info}
+        return self.info, self.code, self.msg
 
 
 # ************ HTTP ERROR **********
@@ -28,14 +28,17 @@ class AuthenticationError(ApiException):
     code = 1001
     msg = '认证失败'
 
+    @property
+    def os(self):
+        return self.info, self.code, self.msg
+
 
 class ParamsError(ApiException):
     code = 1002
     msg = '参数错误'
 
     def __init__(self, msg, info=None):
-        if msg:
-            self.msg = msg
+        self.msg = msg
         if info:
             self.info = info
 
@@ -70,6 +73,11 @@ class DataTypeError(ApiException):
     msg = '数据类型错误'
 
 
+class SignatureError(ApiException):
+    code = 1009
+    msg = '签名错误'
+
+
 # ************ OS INNER EXCEPTION ***********
 class OSInnerError(ApiException):
     msg = '系统内部服务异常'
@@ -94,3 +102,4 @@ class RabbitmqError(OSInnerError):
 class CacheError(OSInnerError):
     """缓存异常"""
     code = 1105
+

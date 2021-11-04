@@ -6,8 +6,9 @@
 
 from conf.base import VERSION
 from handlers.http_handler.main_handler import MainHandler
-
+from handlers.http_handler.register_handler import RegisterHandler
 
 urls = [
     (VERSION + '/', MainHandler),
+    (VERSION + '/merchant/register/', RegisterHandler)
 ]

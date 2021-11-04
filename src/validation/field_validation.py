@@ -367,8 +367,19 @@ class IsPhone(FieldValidException):
     def valid(self, val):
         if not isinstance(val, str):
             raise FieldValidException('该字段必须是一个字符串格式')
-        code = re.match(r'^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0-3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$', val)
+        code = re.match(r'^(1)\d{10}$', val)
         if not code:
             raise FieldValidException('手机号码格式不正确')
+        return val
+
+
+class IsNum(FieldValidation):
+
+    def __init__(self, message='该字段必须是一个纯数字的字符串'):
+        super().__init__(message)
+
+    def valid(self, val: str):
+        if not val.isdigit():
+            raise FieldValidException('该字段必须是一个纯数字的字符串')
         return val
 

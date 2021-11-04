@@ -7,7 +7,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from src.models.base import Base
-from src.models import user, admin
+from src.models import users
 
 
 # this is the Alembic Config object, which provides

@@ -9,18 +9,18 @@ import traceback
 from functools import wraps
 from typing import List, Set
 
-from tornado.log import access_log
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 
 from conf import settings
 
-# from utils.response import TokenError, AuthorityError
-#
 # from django.conf import settings
 # from web.cache.user_cache import UserCache, RoleCache
 # from web.models.user import User
-from utils.cache_set import UserCache
+from models.users import Merchant
+from utils.cache_set import UserCache, RoleCache
 from utils.web_log import get_logger
+
+# ============= token加密与解密
 
 
 def user_to_token(user, expiration=None):
@@ -28,7 +28,6 @@ def user_to_token(user, expiration=None):
     if not expiration:
         expiration = settings.TOKEN_EXPIRATION
     s = Serializer(settings.SECRET_KEY, salt=settings.AUTH_SALT, expires_in=expiration)
-    # now = datetime.datetime.now()
     return s.dumps({
         'username': user.username,
         'id': user.id,
@@ -37,7 +36,7 @@ def user_to_token(user, expiration=None):
 
 def token_to_user(token):
     if not token:
-        return None, None
+        return None
     try:
         s = Serializer(settings.SECRET_KEY, salt=settings.AUTH_SALT)
         data = s.loads(token, return_header=True)[0]
@@ -49,7 +48,7 @@ def token_to_user(token):
         user = cache.get_user_by_pk(user_id)
         setattr(user, 'token', token)
         setattr(user, 'remaining_time', remaining_time)
-        return user, token
+        return user
     # 该模块提供的一些异常
     except BadSignature:
         get_logger().error('签名错误: {}'.format(token))
@@ -57,10 +56,14 @@ def token_to_user(token):
         get_logger().error('过期token: {}'.format(token))
     except Exception:
         get_logger().error(traceback.format_exc())
-    return None, None
+    return None
+
+
+# ============= 进入试图必须的角色权限
 
 
 # def roles_required(*role_names):
+#     """角色需求"""
 #     def view_func(func):
 #         @wraps(func)
 #         def _wrapper(self, *args, **kargs):
@@ -71,12 +74,10 @@ def token_to_user(token):
 #                 print(has_roles(user, *role_names))
 #                 return func(self, *args, **kargs)
 #             raise AuthorityError()
-#
 #         return _wrapper
-#
 #     return view_func
-#
-#
+
+# 辛苦了Thanks for your hard work
 # def permissions_required(*permission_names, **kwargs):
 #     """权限需求"""
 #
@@ -115,8 +116,11 @@ def token_to_user(token):
 #         return _wrapper
 #
 #     return view_func
-#
-#
+
+
+# ============= 是否拥有角色权限
+
+
 # def has_roles(user: User, *role_name: str):
 #     # 判断是否有某些角色
 #     return set(role_name) & set(get_role_names(user))
@@ -130,6 +134,13 @@ def token_to_user(token):
 #         return True
 #     return bool(set(permission_name) & permission_name_of_user)
 #
+# # ============= 获取角色权限
+#
+#
+# def get_role_names(user) -> List[str]:
+#     user_cache = UserCache()
+#     return [x.role_name for x in user_cache.get_roles(user)]
+#
 #
 # def get_permissions(user: User) -> Set[str]:
 #     user_cache = UserCache()
@@ -141,26 +152,6 @@ def token_to_user(token):
 #         permissions_name_of_role = role_cache.get_permissions_name(role.id)
 #         permission_name_of_user.update(permissions_name_of_role)
 #     return permission_name_of_user
-#
-#
-# def get_role_names(user: User) -> List[str]:
-#     cache = UserCache()
-#     return [x.role_name for x in cache.get_roles(user)]
-#
-#
-# def celery_client_required(func):
-#     @wraps(func)
-#     def _wrapper(self, *args, **kwargs):
-#         token = self.request.headers.get('Token')
-#         if token != settings.CELERY_CLIENT:
-#             raise TokenError()
-#         return func(self, *args, **kwargs)
-#
-#     return _wrapper
-#
-#
-# def check_mobile_uuid(mobile_uuid):
-#
-#     if not mobile_uuid:
-#         return True
-#     return False
+
+
+
