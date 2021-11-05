@@ -3,17 +3,12 @@
 # @Function: 
 # @Author: pl
 # @Time: 2021/10/18 14:14
-# __*__coding:utf-8__*__
-# @ModuleName:
-# @Function:
-# @Author: pl
-# @Time: 2021/10/13 16:58
 import contextlib
 from asyncio import current_task
 from functools import wraps
 from typing import Callable
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_scoped_session
 from sqlalchemy.orm import sessionmaker, Session, scoped_session
 
@@ -100,31 +95,34 @@ def provide_session(func):
 
 
 # SYNC
-class SyncDatabaseManager(object):
+class SyncDatabaseManager:
     """
     连接元数据库的类，在__init__中进行初始化
     """
     def __init__(self):
         # 第一步：创建一个AsyncEngine实例
-        self._engine = create_engine(('mysql+aiomysql://{}:{}@{}:{}/{}'.format(
+        self._engine = create_engine(('mysql+pymysql://{}:{}@{}:{}/{}'.format(
             settings.MYSQL_USER,
             settings.MYSQL_PASSWORD,
             settings.MYSQL_HOST,
             settings.MYSQL_PORT,
             settings.MYSQL_DATABASE,
-            )), echo=True)
+            )), echo=True, future=True)
 
-        self.session = None
+        self._session = None
         self.initialize()
 
     def initialize(self):
-        self.session = Session(bind=self._engine)
+        self._session = scoped_session(sessionmaker(bind=self._engine))
+
+    @property
+    def session(self):
+        return self._session
 
 
 @contextlib.contextmanager
 def sync_session():
-    db = SyncDatabaseManager()
-    session = db.session
+    session = SyncDatabaseManager().session
     try:
         yield session
         session.commit()
@@ -138,8 +136,8 @@ def sync_session():
 if __name__ == '__main__':
     from models.users import Merchant
     with sync_session() as session:
-        data = session.query(Merchant).all()
+        data = session.query(Merchant).filter(Merchant.id == 1).first()
+        print(dir(data))
 
 
-    print(data)
 

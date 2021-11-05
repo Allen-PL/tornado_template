@@ -51,9 +51,9 @@ class Merchant(BaseModel):
     __tablename__ = 'merchant'
     phone = Column(String(18), unique=True, index=True, nullable=False, comment='手机号(用于登录)')
     password = Column(String(128), nullable=False, comment='用于密码')
-    avatar = Column(String(256), nullable=False, comment='用户头像')
+    avatar = Column(String(256), nullable=True, comment='用户头像')
     status = Column(Boolean, default=True, comment='账户状态')
-    no = Column(String(32), nullable=False, comment='工号')
+    no = Column(String(32), nullable=True, comment='工号')
     department = Column(String(64), default='', index=True, comment='部门')
     last_time = Column(DateTime, nullable=True, comment='最后登录时间')
     ipaddr = Column(String(32), default='', comment='登录ip地址')
