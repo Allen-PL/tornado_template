@@ -133,6 +133,10 @@ def sync_session():
         session.close()
 
 
+def query():
+    pass
+
+
 if __name__ == '__main__':
     from models.users import Merchant
     with sync_session() as session:

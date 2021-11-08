@@ -5,7 +5,7 @@
 # @Time: 2021/11/5 13:41
 from typing import Dict
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncResult
 
 
@@ -26,7 +26,7 @@ class UsersDao():
     def add_merchant(cls, **kwargs) -> Dict:
         with sync_session() as session:
             data = session.add(Merchant(phone=kwargs.get('phone'), password=kwargs.get('password')))
-            print(data)
+            print(data.phone)
 
         return {
             'name': 'pl'
@@ -36,7 +36,10 @@ class UsersDao():
     @pagination
     def get_merchant(cls, **kwargs):
         with sync_session() as session:
-            data = session.query(Merchant).all()
+            data = session.query(Merchant).filter(Merchant.id >= 1)
+
+            print('data:', data.count())
+
             return data
 
 
@@ -45,8 +48,10 @@ if __name__ == '__main__':
         'page': 1,
         'page_size': 10
     })
-    print('======data:', dir(data[0]))
-    # for i in range(1, 20):
+    # 装饰器返回
+    # print('======data:', data[0].phone)
+
+
     #     data = {
     #         'phone': str(i),
     #         'password': str(i)

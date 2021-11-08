@@ -10,6 +10,7 @@ from typing import Any, List
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, text
 from sqlalchemy.ext.declarative import declarative_base
 
+
 from src.common.exceptions import ParamsError
 
 Base = declarative_base()
