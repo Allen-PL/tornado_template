@@ -122,19 +122,15 @@ class SyncDatabaseManager:
 
 @contextlib.contextmanager
 def sync_session():
-    session = SyncDatabaseManager().session
+    db = SyncDatabaseManager()
     try:
-        yield session
-        session.commit()
+        yield db.session
+        db.session.commit()
     except Exception:
-        session.rollback()
+        db.session.rollback()
         raise MySQLError
     finally:
-        session.close()
-
-
-def query():
-    pass
+        db.session.close()
 
 
 if __name__ == '__main__':
@@ -142,6 +138,8 @@ if __name__ == '__main__':
     with sync_session() as session:
         data = session.query(Merchant).filter(Merchant.id == 1).first()
         print(dir(data))
+
+
 
 
 

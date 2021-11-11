@@ -3,8 +3,10 @@
 # @Function: 
 # @Author: pl
 # @Time: 2021/11/4 9:52
+from connector.mysql_connector import sync_session
 from dao.users_dao import UsersDao
 from handlers.base_handler import BaseHandler
+from models.users import Merchant
 from utils.utils import gen_sms_code
 from validation import BaseValidation, NotEmpty, IsPhone, IsNum, NotNull
 
@@ -51,7 +53,15 @@ class RegisterHandler(BaseHandler):
             }
         )
 
-        # result = UsersDao.add_merchant(**self.data)
+        with sync_session() as session:
+            data = session.query(Merchant).all()
+            Merchant.query
+            # 这个query才是重点
+            # data = Merchant.query.all()
+
+            print(data)
+
+        # result = UsersDao.get_merchant(self.data)
 
 
         self.response_data({

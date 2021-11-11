@@ -11,15 +11,10 @@ C
 logs/2021-10-15.log,d\1\d1ea5f32b5a8055edb90bb932c418c70dacdddb4
 C
 logs/2021-10-18.log,2\c\2cea494ee753c86f2b0d7689052fb50195df5757
-:
-
-.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
 C
 logs/2021-10-19.log,e\e\ee6b3ac415c776928c50f666ab7769d906c2d609
 S
 #src/connector/rabbitmq_connector.py,f\c\fcb4112796f5842cbc667d7c050cb863754bae4e
-R
-"src/connector/mongodb_connector.py,9\5\95392f07e310df9610976fc941c375a3f2041df0
 ;
 alembic.ini,d\8\d84513684d01938b65661cf0358065b11872e9bf
 F
@@ -58,8 +53,6 @@ R
 "src/validation/field_validation.py,0\8\08a0146cfa775e114581f92ae9d6077fd81393f4
 F
 src/models/__init__.py,2\2\22bfbcdf88b8f6b5ddadabbf681bf91dcfd38091
-F
-src/constants/table.py,c\e\ce54197f51c33f4bb705903e5bf1c1b83fe96b17
 Q
 !src/validation/base_validation.py,c\9\c9cc4ec6f037496082468c01ca7bf084dd5945ee
 F
@@ -82,7 +75,7 @@ B
 src/conf/prod.py,5\1\51a0228c3c57fd8c7e3ad0d6cc31213891905861
 ?
 src/conf/dev.py,9\7\97365ad3f306a568bc25f57063a76eeb9d3cef0d
-C
-src/models/users.py,4\9\4933b768a72cd2c19fbcfcd8485f8b71fd790aa0
 A
 src/common/web.py,7\6\76cdf125babcf8ad3b3d6d1395cb360e59271430
+L
+src/handlers/base_handler.py,4\5\456a617c00b71c757870d87acc877c62b0b63598
