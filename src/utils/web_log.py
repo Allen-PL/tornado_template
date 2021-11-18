@@ -29,11 +29,7 @@ def log_request(handler: RequestHandler):
 
 
 def get_logger():
-    return DefaultLogger.get_logger(settings.LOG_FULL_PATH, 1024 * 1024 * 10, 30)
-
-
-
-
+    return DefaultLogger.get_logger(settings.LOG_LEVEL, settings.LOG_FULL_PATH, settings.LOG_SIZE, settings.LOG_BACK_COUNT)
 
 
 

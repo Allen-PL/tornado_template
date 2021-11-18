@@ -13,8 +13,8 @@ from tornado import web, websocket, gen
 from common.exceptions import ApiException, DataTypeError, AuthenticationError, ParamsError
 from conf import settings
 from utils.auth_util import token_to_user
-from utils.web_log import get_logger
 from utils.sign import check_sign
+from utils.web_log import get_logger
 
 
 class HttpBasicHandler(web.RequestHandler):

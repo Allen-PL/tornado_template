@@ -31,11 +31,9 @@ def user_login(func):
                 self.data['user'] = user
             except Exception as e:
                 get_logger().exception(f'initialize认证异常：token解析失败，异常原因： {e}')
-                self.response_data(*AuthenticationError().os)
-                return
+                return self.response_data(*AuthenticationError().os)
         else:
             get_logger().exception('initialize认证异常：token未传，登录认证失败!')
-            self.response_data(*AuthenticationError().os)
-            return  # 调用一次finish之后会再去执行后续的代码，在执行func的也会出发finish方法抛错
+            return self.response_data(*AuthenticationError().os)
         return func(self, *args, **kwargs)
     return wrapper

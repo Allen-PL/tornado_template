@@ -3,6 +3,7 @@
 # @Function: 
 # @Author: pl
 # @Time: 2021/10/13 16:44
+import logging
 import os
 import datetime
 
@@ -10,7 +11,7 @@ import datetime
 
 # APP BASIC INFO
 APP_HOST = '127.0.0.1'
-APP_PORT = 8888
+APP_PORT = 9999
 DEBUG = True
 
 # VERSION INFO
@@ -25,8 +26,10 @@ AUTH_SALT = 'chinaNB'
 TOKEN_EXPIRATION = 60 * 60 * 24 * 7  # 默认设备过期时间7天
 
 # ************************** LOG CONF INFO *****************************
-
+LOG_SIZE = 1024 * 1024 * 10
+LOG_LEVEL = 'INFO'
 LOG_FULL_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'logs/{}.log'.format(datetime.datetime.today().strftime('%Y-%m-%d')))
+LOG_BACK_COUNT = 30
 
 
 # ************************** CONNECTOR CONF INFO ************************

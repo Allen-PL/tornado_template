@@ -19,7 +19,6 @@ from connector.redis_connector import BaseCache
 from handlers.base_handler import BaseHandler
 from common.exceptions import ApiException, AuthenticationError
 from utils.cache_set import UserCache
-from utils.web_log import get_logger
 from validation import BaseValidation, NotNull, Past, NotEmpty, Size
 
 

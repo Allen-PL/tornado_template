@@ -37,8 +37,9 @@ class ParamsError(ApiException):
     code = 1002
     msg = '参数错误'
 
-    def __init__(self, msg, info=None):
-        self.msg = msg
+    def __init__(self, msg=None, info=None):
+        if msg:
+            self.msg = msg
         if info:
             self.info = info
 

@@ -18,9 +18,9 @@ from conf import settings
 # from web.models.user import User
 from models.users import Merchant
 from utils.cache_set import UserCache, RoleCache
-from utils.web_log import get_logger
 
 # ============= token加密与解密
+from utils.web_log import get_logger
 
 
 def user_to_token(user, expiration=None):

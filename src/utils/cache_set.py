@@ -7,7 +7,6 @@ from typing import Dict, Any
 
 from common.exceptions import CacheError
 from connector.redis_connector import BaseCache
-from utils.web_log import get_logger
 
 
 class UserCache(BaseCache):

@@ -3,27 +3,60 @@
 # @Function: 
 # @Author: pl
 # @Time: 2021/10/18 11:36
-import logging
+import logging.config
 from logging.handlers import RotatingFileHandler
 from os.path import splitext, basename
 
+from conf import settings
 
-class DefaultLogger:
-    logger = None
+
+class DefaultLogger():
+    standard_format = '[%(asctime)s][%(threadName)s:%(thread)d][task_id:%(name)s][%(filename)s:%(lineno)d][%(levelname)s][%(message)s]'
+    simple_format = '%(asctime)s %(message)s'
 
     @classmethod
-    def get_logger(cls, log_path, log_size, log_num):
-        if not cls.logger:
-            cls.logger = logging.getLogger(splitext(basename(log_path))[0])
-            cls.logger.setLevel(logging.INFO)
-            formatter = logging.Formatter('%(asctime)s ' +
-                                          ' %(name)s %(levelname)s %(pathname)s %(funcName)s %(lineno)d : %(message)s')
-            steam_handler = logging.StreamHandler()
-            steam_handler.setFormatter(formatter)
-            cls.logger.addHandler(steam_handler)
+    def get_logger(cls, log_level=settings.LOG_LEVEL, log_path=settings.LOG_FULL_PATH,
+                   log_size=settings.LOG_SIZE, log_back_count=settings.LOG_BACK_COUNT):
+        # log配置字典
+        LOGGING_DIC = {
+            'version': 1,
+            'disable_existing_loggers': False,
+            # 封装上面定义的日志格式
+            'formatters': {
+                'standard': {'format': cls.standard_format},
+                'simple': {'format': cls.simple_format},
+            },
+            'handlers': {
+                # 日志输出到终端
+                'stream': {
+                    'level': log_level,  # 输出到终端的级别
+                    'class': 'logging.StreamHandler',  # 选择输出到终端的类
+                    'formatter': 'simple'  # 输出的模式，是上面定义的
+                },
+                # 日志输出到文件
+                'file': {
+                    'level': log_level,
+                    'class': 'logging.handlers.RotatingFileHandler',
+                    'formatter': 'standard',
+                    'filename': log_path,  # 输出的日志文件
+                    'maxBytes': log_size,  # 单文件日志大小（最好不要设置太大）
+                    'backupCount': log_back_count,  # 最多保存的日志文件个数
+                    'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
+                },
+            },
+            'loggers': {
+                # logging.getLogger(__name__)拿到的logger配置
+                '': {
+                    'handlers': ['file', 'stream'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+                    'level': 'INFO',
+                    'propagate': True,  # 向上（更高level的logger）传递
+                },
+            },
+        }
+        # 导入上面定义的logging配置
+        logging.config.dictConfig(LOGGING_DIC)
+        # 生成一个log实例
+        logger = logging.getLogger()
+        return logger
 
-            if log_path:
-                rotate_handler = RotatingFileHandler(log_path, maxBytes=log_size, backupCount=log_num)
-                rotate_handler.setFormatter(formatter)
-                cls.logger.addHandler(rotate_handler)
-        return cls.logger
+
