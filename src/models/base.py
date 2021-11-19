@@ -13,7 +13,7 @@ import sqlalchemy
 from sqlalchemy import orm, Column, Integer, String, Boolean, DateTime, func, text, inspect
 from sqlalchemy.ext.declarative import declarative_base
 
-from connector.mysql_connector import sync_session
+from src.connector.mysql_connector import sync_session
 from src.common.exceptions import ParamsError, ApiException, TokenError
 
 Base = declarative_base()
@@ -39,28 +39,45 @@ class CRUDMixin(object):
     """Mixin 添加CRUD操作: create, get(read), update, delete"""
 
     @classmethod
-    def get_pk(cls, **kwargs):
-        """查询某条数据是佛存在，返回pk"""
-        with sync_session() as session:
-            return session.query(cls).filter_by(**kwargs).first().id
+    def objects_to_dict(cls, objects) -> [List, Dict]:
+        result_dict = []
+        print(objects)
+        if isinstance(objects, List):
+            for o in objects:
+                element = {}
+                for c in cls.__table__.columns:
+                    element[c.name] = getattr(o, c.name)
+                result_dict.append(element)
+            return result_dict
+        else:
+            return {c.name: getattr(objects, c.name) for c in cls.__table__.columns}
 
     @classmethod
-    def get(cls, **kwargs) -> object:
+    def get_one(cls, **kwargs) -> object:
         """查询单条数据"""
         with sync_session() as session:
-            return session.query(cls).filter_by(**kwargs).first()
+            return cls.objects_to_dict(session.query(cls).filter_by(**kwargs).first())
 
     @classmethod
     def get_all(cls, **kwargs) -> List:
         """查询条件所有"""
         with sync_session() as session:
-            return session.query(cls).filter_by(**kwargs).all()
+            return cls.objects_to_dict(session.query(cls).filter_by(**kwargs).all())
 
     @classmethod
-    def all(cls):
-        """获取表多有"""
+    def pagination(cls, data, condition=None):
+        """获取分页数据"""
+        if condition is None:
+            condition = {}
+        page = data.get('page') or None
+        page_size = data.get('page_size') or None
+        if page is None or page_size is None:
+            raise ParamsError()
+        if int(page) < 1 or int(page_size) <= 0:
+            raise ParamsError()
         with sync_session() as session:
-            return session.query(cls).all()
+            return cls.objects_to_dict(session.query(cls).filter_by(**condition).limit(page_size).offset(
+                (int(page) - 1) * int(page_size)).all())
 
     @classmethod
     def add(cls, **kwargs):
@@ -73,21 +90,7 @@ class CRUDMixin(object):
             return session.add(instance)
 
     @classmethod
-    def get_list(cls, data, condition=None):
-        """获取分页数据"""
-        if condition is None:
-            condition = {}
-        page = data.get('page') or None
-        page_size = data.get('page_size') or None
-        if page is None or page_size is None:
-            raise ParamsError()
-        if int(page) < 1 or int(page_size) <= 0:
-            raise ParamsError()
-        with sync_session() as session:
-            return session.query(cls).filter_by(**condition).limit(page_size).offset((int(page) - 1) * int(page_size)).all()
-
-    @classmethod
-    def update(cls, old_pk: int, **kwargs):
+    def update(cls, old_instance: Dict, **kwargs):
         """更新"""
         # TODO 这里应该防止kwargs存在数据库中已有的字段
         data = {}
@@ -95,32 +98,85 @@ class CRUDMixin(object):
             if hasattr(cls, attr):
                 data[attr] = value
         with sync_session() as session:
-            return session.query(cls).filter_by(id=old_pk).update(data)
+            return session.query(cls).filter_by(id=old_instance.get('id').update(data))
 
-    @classmethod
-    def delete(cls, old_pk: int):
+    @ classmethod
+    def delete(cls, old_instance: Dict):
         """硬删除"""
         with sync_session() as session:
-            return session.query(cls).filter_by(id=old_pk).delete()
+            return session.query(cls).filter_by(id=old_instance.get('id')).delete()
 
 
 class JSONSerializerMixin(object):
+    """
+    目前只支持单张表的序列化，因为本项目中多有的表都是端关联的，所以设计多张表的情况，到时候就手动进行处理
+    """
 
-    @classmethod
-    def serializer(cls, data: Any, is_dict=False):
+    def serializer(self, data: [Dict, List]):
         """
-        :param data: [object, ...] or obejct or {}
-        :param is_dict:
+        :param data: [{}, ...] or {}
         :return:
         """
-        fields_list = []
-        if not is_dict:
-            for obj in cls.__table__.columns.values():
-                fields_list.append(obj.key)
+        setattr(self, 'origin_data', data)
+        return self
 
-        else:
-            pass
+    def get_display(self, fields: List, t: str):
+        origin_data = getattr(self, 'origin_data')
+        model_fields = [c.name for c in self.__table__.columns]
 
+        for field in fields:
+            if field.key not in model_fields:
+                assert '请检查get_display()方法中参数是否存在于数据库表中'
+            if t == 'str':
+                # 类型转化，母线只有一个，后面可以都在这里进行扩展
+                if isinstance(field.type, DateTime):
+                    for data in origin_data:
+                        data[field.key] = data.get(field.key).strftime('%Y-%m-%d %H:%M:%S')
+            elif t == 'choice':
+                pass
+        return self
+
+    def alias(self):
+        # 替换键名
+        pass
+
+    def exclude(self, fields: List) -> [List, Dict]:
+        # 判定链式调用此方法的必须是serializer
+        real_exclude_fields = []
+        model_fields = [c.name for c in self.__table__.columns]
+        for field in fields:
+            if field not in model_fields:
+                continue
+            real_exclude_fields.append(field)
+        origin_data = getattr(self, 'origin_data')
+        if isinstance(origin_data, List):
+            for i in range(len(origin_data)):
+                for del_field in real_exclude_fields:
+                    origin_data[i].pop(del_field)
+        elif isinstance(origin_data, Dict):
+            for del_field in real_exclude_fields:
+                origin_data.pop(del_field)
+        return self
+
+    def show(self, fields: List) -> [List, Dict]:
+        real_exclude_field = model_fields = [c.name for c in self.__table__.columns]
+        for field in fields:
+            if field not in model_fields:
+                continue
+            real_exclude_field.remove(field)
+        origin_data = getattr(self, 'origin_data')
+        if isinstance(origin_data, List):
+            for i in range(len(origin_data)):
+                for del_field in real_exclude_field:
+                    origin_data[i].pop(del_field)
+        elif isinstance(origin_data, Dict):
+            for del_field in real_exclude_field:
+                origin_data.pop(del_field)
+        return self
+
+    @property
+    def data(self):
+        return getattr(self, 'origin_data')
 
 
 class BaseModel(Base, CRUDMixin, JSONSerializerMixin):

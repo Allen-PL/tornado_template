@@ -33,10 +33,6 @@ U
 %alembic/versions/3bd04ae1b323_init.py,7\4\74b9b79c48192ffda2a4637a2bb8c1b51237bae0
 U
 %alembic/versions/b6f12253eb7d_init.py,6\0\60b5b5226c64bddd3cdc8ba4f78186911c203f5b
-A
-src/models/sms.py,1\b\1bb8e762292477a9ba510878033093bd9856cb37
-G
-src/models/equipment.py,3\a\3a05d93901d23c469d76731c97b1c2874312b937
 >
 alembic/env.py,a\8\a8ace36681c69e94af6eece7b11f9f74efbcc4d6
 D
@@ -61,15 +57,11 @@ B
 src/utils/utils.py,f\0\f0ba0c41d3a06cbbb90e27c5a39467a2c1cf5dd9
 R
 "src/connector/mongodb_connector.py,9\5\95392f07e310df9610976fc941c375a3f2041df0
-F
-src/constants/table.py,c\e\ce54197f51c33f4bb705903e5bf1c1b83fe96b17
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
 D
 src/models/readme.md,c\d\cddcb2f893a8011739f509e24a875e188cab2846
-D
-src/dao/users_dao.py,1\1\11355986abb118b0382ac0bfe5320ba3a442500d
 C
 logs/2021-10-20.log,d\4\d4d8aa8b2da8606a5b93de05322d339f36ba69c0
 C

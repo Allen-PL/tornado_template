@@ -54,14 +54,15 @@ class RegisterHandler(BaseHandler):
             }
         )
 
-        """（所以就有两种序列化的方案：单张表的基于对象序列化；单张表或者多张表的基于字典的再序列化）
+        """（
         涉及多张表的时候怎么处理(全部字段组合成dict再处理)
-        字段显示部分怎么处理（通过exclude/fields两个方法来实现）
-        字段不以源数据格式展示怎么办（可以加多个方法的来实现，比如int_to_str("字段名称")）
         """
-        instances = Merchant().get_list(self.data)
-        Merchant().serializer(instances)
+        merchant_data = Merchant().pagination(self.data)
 
+        print(Merchant)
+        # print(Merchant().serializer(merchant_data).show(['id', 'create_time']).get_display([Merchant.create_time], 'str').data)
+
+        # Merchant().serializer(instances).fields('aa')
 
         return self.response_data({
             'result': 'ok'

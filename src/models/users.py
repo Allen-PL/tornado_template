@@ -3,7 +3,8 @@
 # @Function: 
 # @Author: pl
 # @Time: 2021/10/19 15:32
-from sqlalchemy import Column, String, Boolean, BigInteger, UniqueConstraint, DateTime
+from sqlalchemy import Column, String, Boolean, BigInteger, UniqueConstraint, DateTime, Integer
+from sqlalchemy_utils import ChoiceType
 
 from src.models.base import BaseModel
 
@@ -48,6 +49,10 @@ class ARole(BaseModel):
 # #########################  商户、角色   ##############################
 # 商户表
 class Merchant(BaseModel):
+    a = (
+        (1, 'a'),
+        (2, 'b')
+    )
     __tablename__ = 'merchant'
     phone = Column(String(18), unique=True, index=True, nullable=False, comment='手机号(用于登录)')
     password = Column(String(128), nullable=False, comment='用于密码')
