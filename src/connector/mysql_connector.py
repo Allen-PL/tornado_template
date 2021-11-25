@@ -4,6 +4,7 @@
 # @Author: pl
 # @Time: 2021/10/18 14:14
 import contextlib
+import time
 from asyncio import current_task
 from functools import wraps
 from math import ceil
@@ -12,6 +13,7 @@ from typing import Callable
 from sqlalchemy import create_engine, select, orm
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_scoped_session
 from sqlalchemy.orm import sessionmaker, Session, scoped_session
+from tornado import gen
 
 from src.common.exceptions import MySQLError, ParamsError
 from src.conf import settings
@@ -45,7 +47,7 @@ class DatabaseManager:
             expire_on_commit=False,
             class_=AsyncSession
         )
-        # 第三步：session非线程安全，它是一个全局对象，次方法是确保线程本地化（在单线程中使用同一个session）
+        # 第三步：session非线程安全，它是一个全局对象，此方法是确保线程本地化（在单线程中使用同一个session）
         self.session = async_scoped_session(async_session_factory, scopefunc=current_task)
 
     def cleanup(self):
@@ -80,7 +82,6 @@ def provide_session(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
         arg_session = 'session'
-
         func_params = func.__code__.co_varnames
         session_in_args = arg_session in func_params and \
             func_params.index(arg_session) < len(args)
@@ -91,7 +92,6 @@ def provide_session(func):
             async with create_session() as session:
                 kwargs[arg_session] = session
                 return await func(*args, **kwargs)
-
     return wrapper
 
 

@@ -4,22 +4,8 @@
 # @Author: pl
 # @Time: 2021/10/15 9:20
 # from utils.authenticated import login_authentication
-import time
-from typing import Optional, Awaitable
 
-import tornado
-from aioredis import ConnectionPool, Redis
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from tornado import web
-
-from common.authenlication import user_login
-from conf import settings
-from connector.redis_connector import BaseCache
 from handlers.base_handler import BaseHandler
-from common.exceptions import ApiException, AuthenticationError
-from utils.cache_set import UserCache
-from validation import BaseValidation, NotNull, Past, NotEmpty, Size
 
 
 class MainHandler(BaseHandler):

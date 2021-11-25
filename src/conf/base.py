@@ -8,6 +8,8 @@ import os
 import datetime
 
 # ************************** APP CONF INFO ******************************
+# COMMON SALT（make_password、check_password...）
+COMMON_SALT = '6ijekanpnuy6'
 
 # APP BASIC INFO
 APP_HOST = '127.0.0.1'
@@ -20,10 +22,30 @@ VERSION = '/api/v1'
 # WHITE LIST
 WHITE_LIST = ['']
 
-# TOKEN CONF INFO
+# ACCESS TOKEN CONF INFO
 SECRET_KEY = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'
 AUTH_SALT = 'chinaNB'
-TOKEN_EXPIRATION = 60 * 60 * 24 * 7  # 默认设备过期时间7天
+TOKEN_EXPIRATION = 60 * 60 * 24 * 7  # 默认token过期时间7天
+
+# REFRESH TOKEN CONF INFO
+REFRESH_TOKEN_EXPIRATION = 60 * 60 * 24 * 30  # 默认refresh_token的刷新时间为30天（必须比token的保质期长）
+REFRESH_TOKEN_MAX_TIME = 3  # access token刷新最大的时间配置（单位：h）
+
+# SMS VERIFICATION CODE
+CODE_EXPIRATION = 300  # 验证码默认有效时间5min（300s）
+CODE_REQUEST_EXPIRATION = 60  # 验证码的请求间隔时间默认1min（60s）
+
+# FREQUENCY LIMIT
+FREQUENCY = (60 * 60, 5)  # 默认5次/1h(密码输入错误时，在此有效期做计数)
+FREQUENCY_LIMIT = 60 * 60 * 2  # 当用户输入密码的机会使用完，在此有效期内无法进行登录
+
+# USERS DEFAULT AVATAR
+USERS_DEFAULT_AVATAR = ['https://img1.jepg', 'https://img2.jepg', 'https://img3.jepg', 'https://img4.jepg'
+                        'https://img5.jepg', 'https://img6.jepg', 'https://img7.jepg', 'https://img8.jepg']
+
+# ACCESS WHITELIST(注册、登录、忘记密码)
+ACCESS_WHITELIST = [VERSION + url for url in ('/merchant/register/', '/merchant/login/', '/forget/pwd/')]
+
 
 # ************************** LOG CONF INFO *****************************
 LOG_SIZE = 1024 * 1024 * 10

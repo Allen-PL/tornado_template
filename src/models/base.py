@@ -13,7 +13,7 @@ import sqlalchemy
 from sqlalchemy import orm, Column, Integer, String, Boolean, DateTime, func, text, inspect
 from sqlalchemy.ext.declarative import declarative_base
 
-from src.connector.mysql_connector import sync_session
+from src.connector.mysql_connector import sync_session, create_session
 from src.common.exceptions import ParamsError, ApiException, TokenError
 
 Base = declarative_base()
@@ -107,6 +107,48 @@ class CRUDMixin(object):
             return session.query(cls).filter_by(id=old_instance.get('id')).delete()
 
 
+class AsyncCURDMixin:
+    """
+        # 增
+        result = await Merchant.async_add(new_data)
+        print(result)
+        # 改
+        # old_instance = await session.get(Merchant, 8)
+        # result = await Merchant.async_update(8, {'phone': '12345678910'})
+        # print(result)
+        # 删
+        result = await Merchant.async_delete(8)
+        print(result)
+    """
+
+    @classmethod
+    async def async_add(cls, data: Dict):
+        """新增一条或多条"""
+        instance = cls()
+        async with create_session() as session:
+            for k, v in data.items():
+                setattr(instance, k, v)
+            session.add(instance)
+            return await session.commit()
+
+    @classmethod
+    async def async_update(cls, pk: int, data: Dict):
+        """更新"""
+        async with create_session() as session:
+            old_instance = await session.get(cls, pk)
+            for k, v in data.items():
+                setattr(old_instance, k, v)
+            return await session.commit()
+
+    @classmethod
+    async def async_delete(cls, pk):
+        """硬删除"""
+        async with create_session() as session:
+            old_instance = await session.get(cls, pk)
+            await session.delete(old_instance)
+            return await session.commit()
+
+
 class JSONSerializerMixin(object):
     """
     目前只支持单张表的序列化，因为本项目中多有的表都是端关联的，所以设计多张表的情况，到时候就手动进行处理
@@ -179,11 +221,33 @@ class JSONSerializerMixin(object):
         return getattr(self, 'origin_data')
 
 
-class BaseModel(Base, CRUDMixin, JSONSerializerMixin):
+class BaseModel(Base, JSONSerializerMixin, AsyncCURDMixin):
     __abstract__ = True
     id = Column(Integer, primary_key=True, unique=True, autoincrement=True, comment='ID')
     create_time = Column(DateTime, server_default=func.now(), comment='创建时间')
     update_time = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment='更新时间')
+
+    @classmethod
+    def clean_data(cls, data: Dict, exclude: List = None, fields: List = None) -> Dict:
+        """
+        清洗self.data中的字段，用于插入数据库
+        :param fields:
+        :param exclude:
+        :param data: self.data
+        :return:
+        """
+        new_data = {}
+        if exclude and fields:
+            raise ValueError("Cant's exist at the same time `exclude` and `fields` for clean_data")
+        data_keys = set(data.keys())
+        if exclude and isinstance(fields, List):
+            data_keys = data_keys - set(exclude)
+        elif fields and isinstance(fields, List):
+            data_keys = data_keys & set(fields)
+        for field in set(cls.__table__.columns.keys()) & data_keys:
+            new_data[field] = data.get(field)
+        return new_data
+
 
 
 

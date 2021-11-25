@@ -5,7 +5,7 @@
 # @Time: 2021/10/14 16:05
 import traceback
 
-from common.exceptions import ApiException, ParamsError
+from common.exceptions import ApiException, ParamsError, NotFoundError
 from common.web import HttpBasicHandler
 from common.common_log import DefaultLogger
 from utils.web_log import get_logger

@@ -3,6 +3,8 @@
 @Author  : ybb
 @Time    : 2020/9/28 18:12
 """
+import copy
+
 from .exceptions import ValidException, FieldValidException
 from .field_validation import FieldValidation
 
@@ -16,7 +18,7 @@ class BaseValidation(object):
 
     def _valid(self, data):
         errors = {}
-        validated_data = {}
+        validated_data = copy.deepcopy(data)
         for field, rules in self.valid_rules().items():
             val = data.get(field)
             field_errors = []

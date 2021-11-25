@@ -3,11 +3,8 @@
 # @Function: 
 # @Author: pl
 # @Time: 2021/10/14 13:46
-import datetime
 import time
 import traceback
-from functools import wraps
-from typing import List, Set
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 
@@ -16,22 +13,22 @@ from conf import settings
 # from django.conf import settings
 # from web.cache.user_cache import UserCache, RoleCache
 # from web.models.user import User
-from models.users import Merchant
-from utils.cache_set import UserCache, RoleCache
+from cache.cache_merchant import MerchantCache
 
-# ============= token加密与解密
 from utils.web_log import get_logger
 
 
-def user_to_token(user, expiration=None):
+# 自动续期
+
+
+# ============= token加密与解密
+def merchant_to_token(merchant, expiration=None):
     """设置获取token"""
     if not expiration:
         expiration = settings.TOKEN_EXPIRATION
     s = Serializer(settings.SECRET_KEY, salt=settings.AUTH_SALT, expires_in=expiration)
-    return s.dumps({
-        'username': user.username,
-        'id': user.id,
-    }).decode()
+    token = s.dumps({'username': merchant.phone}).decode()
+    return token
 
 
 def token_to_user(token):
@@ -41,21 +38,21 @@ def token_to_user(token):
         s = Serializer(settings.SECRET_KEY, salt=settings.AUTH_SALT)
         data = s.loads(token, return_header=True)[0]
         header = s.loads(token, return_header=True)[1]
-        user_id = data.get('id')
-        # token的剩余有效时间
+        username = data.get('username')
+        # token的剩余有效时间(单位：h)
         remaining_time = (header.get('exp') - time.time()) / 3600
-        cache = UserCache()
-        user = cache.get_user_by_pk(user_id)
-        setattr(user, 'token', token)
-        setattr(user, 'remaining_time', remaining_time)
-        return user
+        cache = MerchantCache()
+        merchant = cache.get_merchant_instance_by_phone(username)
+        setattr(merchant, 'token', token)
+        setattr(merchant, 'remaining_time', remaining_time)
+        return merchant
     # 该模块提供的一些异常
     except BadSignature:
-        get_logger().error('签名错误: {}'.format(token))
+        get_logger().error(f"功能：解析token || 状态：失败 || 失败原因：签名错误 || 错误token：{token}")
     except SignatureExpired:
-        get_logger().error('过期token: {}'.format(token))
+        get_logger().error(f"功能：解析token || 状态：失败 || 失败原因：token过期 || 错误token：{token}")
     except Exception:
-        get_logger().error(traceback.format_exc())
+        get_logger().error(f"功能：解析token || 状态：失败 || 失败原因：{str(traceback.format_exc())}")
     return None
 
 

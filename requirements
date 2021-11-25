@@ -1,4 +1,6 @@
 tornado==6.1
 SQLAlchemy==1.4.25
+SQLAlchemy-Utils==0.37.9
 almebic==1.7.4
 itsdangerous==2.0.1
+aiomysql==0.0.22

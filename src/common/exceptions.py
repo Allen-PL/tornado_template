@@ -56,7 +56,7 @@ class AuthorityError(ApiException):
 
 class NotFoundError(ApiException):
     code = 1005
-    msg = '无此项目'
+    msg = '路由未发现'
 
 
 class TimeError(ApiException):
@@ -77,6 +77,11 @@ class DataTypeError(ApiException):
 class SignatureError(ApiException):
     code = 1009
     msg = '签名错误'
+
+
+class CustomizeError(ApiException):
+    code = 1010
+    msg = '自定义错误'
 
 
 # ************ OS INNER EXCEPTION ***********
